@@ -6,4 +6,8 @@ package com.traum.models
  * @property name ФИО сотрудника
  * @property phoneNumber номер телефона сотрудника
  */
-data class Employee(val id: Long, var name: String, var phoneNumber: String)
+class Employee {
+    var id: Long = 0
+    var name: String = ""
+    var phoneNumber: String = ""
+}

@@ -1,5 +1,6 @@
 package com.traum.models
 
+import com.traum.currentTimestamp
 import java.sql.Timestamp
 
 /**
@@ -11,12 +12,11 @@ import java.sql.Timestamp
  * @property tableId идентификатор стола
  * @property table стол
  */
-data class Booking(
-    val id: Long,
-    var contactData: String,
-    var start: Timestamp,
-    var end: Timestamp,
-    var tableId: Long
-) {
+class Booking {
+    var id: Long = 0
+    var contactData: String = ""
+    var start: Timestamp = currentTimestamp()
+    var end: Timestamp = currentTimestamp()
+    var tableId: Long = 0
     var table: Table? = null
 }

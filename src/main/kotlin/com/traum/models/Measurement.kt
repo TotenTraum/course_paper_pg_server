@@ -5,4 +5,7 @@ package com.traum.models
  * @property id Идентификатор строки в таблице
  * @property [name] Название измерения
  */
-data class Measurement(val id: Long, var name: String)
+class Measurement {
+    var id: Long = 0
+    var name: String = ""
+}

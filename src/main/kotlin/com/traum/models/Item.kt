@@ -10,13 +10,12 @@ package com.traum.models
  * @property category Категория
  * @property measures Список мер измерений
  */
-data class Item(
-    val id: Long,
-    var name: String,
-    var description: String,
-    var isNotForSale: Boolean,
-    var categoryId: Long
-) {
+class Item {
+    var id: Long = 0
+    var name: String = ""
+    var description: String = ""
+    var isNotForSale: Boolean = false
+    var categoryId: Long = 0
     var category: Category? = null
     var measures: List<MeasureOfItem>? = null
 }

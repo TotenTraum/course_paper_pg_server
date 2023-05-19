@@ -1,5 +1,6 @@
 package com.traum
 
+import com.traum.models.Booking
 import io.ktor.server.application.*
 import com.traum.plugins.*
 
@@ -8,6 +9,7 @@ fun main(args: Array<String>): Unit =
 
 @Suppress("unused") // application.conf references the main function. This annotation prevents the IDE from marking it as unused.
 fun Application.module() {
+    configureDI()
     configureSecurity()
     configureHTTP()
     configureSerialization()

@@ -1,12 +1,13 @@
 package com.traum.plugins
 
+import com.traum.DIModules.ConnectionModule
 import io.ktor.server.application.*
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
-fun Application.registrateDI() {
+fun Application.configureDI() {
     install(Koin) {
         slf4jLogger()
-
+        modules(ConnectionModule(this@configureDI))
     }
 }

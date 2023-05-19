@@ -12,13 +12,12 @@ import java.math.BigDecimal
  * @property itemId идентификатор товара
  * @property item Товар
  */
-data class ElementOfOrder(
-    val id: Long,
-    var amount: Int,
-    var sum: BigDecimal,
-    var orderId: Long,
-    var itemId: Long,
-) {
+class ElementOfOrder {
+    var id: Long = 0
+    var amount: Int = 0
+    var sum: BigDecimal = BigDecimal(0)
+    var orderId: Long = 0
+    var itemId: Long = 0
     var order: Order? = null
     var item: Item? = null
 }

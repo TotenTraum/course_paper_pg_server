@@ -11,12 +11,11 @@ import java.math.BigDecimal
  * @property measurementId идентификатор меры измерения
  * @property measurement Мера измерения
  */
-data class MeasureOfItem(
-    val id: Long,
-    var amount: BigDecimal,
-    var itemId: Long,
-    var measurementId: Long
-) {
+class MeasureOfItem {
+    var id: Long = 0
+    var amount: BigDecimal = BigDecimal(0)
+    var itemId: Long = 0
+    var measurementId: Long = 0
     var item: Item? = null
     var measurement: Measurement? = null
 }

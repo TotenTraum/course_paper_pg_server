@@ -5,4 +5,7 @@ package com.traum.models
  * @property id Идентификатор строки в таблице
  * @property [name] Категория товара(Напитки, супы и т.д.)
  */
-data class Category(val id: Long, var name: String)
+class Category {
+    var id: Long = 0
+    var name: String = ""
+}

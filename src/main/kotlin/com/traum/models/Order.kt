@@ -1,5 +1,6 @@
 package com.traum.models
 
+import com.traum.currentTimestamp
 import java.math.BigDecimal
 import java.sql.Timestamp
 
@@ -13,13 +14,13 @@ import java.sql.Timestamp
  * @property employeeId идентификатор сотрудника
  * @property employee Обслуживший сотрудник
  */
-data class Order(
-    val id: Long,
-    var date: Timestamp,
-    var sum: BigDecimal,
-    var employeeId: Long,
-    var tableId: Long
-) {
+class Order {
+    var id: Long = 0
+    var date: Timestamp = currentTimestamp()
+
+    var sum: BigDecimal = BigDecimal(0)
+    var employeeId: Long = 0
+    var tableId: Long = 0
     var table: Table? = null
     var employee: Employee? = null
     var elements: MutableList<ElementOfOrder>? = null

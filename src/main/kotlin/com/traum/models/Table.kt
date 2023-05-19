@@ -5,4 +5,7 @@ package com.traum.models
  * @property id Идентификатор строки в таблице
  * @property tableNumber Номер стола в кафе
  */
-data class Table(val id: Long, var tableNumber: Int)
+class Table {
+    var id: Long = 0
+    var tableNumber: Int = 0
+}

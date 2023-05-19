@@ -1,5 +1,6 @@
 package com.traum.models
 
+import com.traum.currentTimestamp
 import java.sql.Timestamp
 
 /**
@@ -9,9 +10,9 @@ import java.sql.Timestamp
  * @property created Время создания лога
  * @property roleCreated Роль, при которой был создан лог
  */
-data class Log(
-    val id: Long,
-    var source: String,
-    var created: Timestamp,
-    var roleCreated: String
-)
+class Log {
+    var id: Long = 0
+    var source: String = ""
+    var created: Timestamp = currentTimestamp()
+    var roleCreated: String = ""
+}

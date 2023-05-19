@@ -6,15 +6,6 @@ create table "Logs"
     "RoleCreated" name        not null
 );
 
-create or replace procedure "AddLog"(source varchar(64), created date, role_creator name)
-    language plpgsql
-as
-$$
-begin
-    insert into "Logs"("Source", "Created", "RoleCreated") values ($1, $2, $3);
-end
-$$;
-
 -- Таблица столов кафе
 create table "Tables"
 (
@@ -32,7 +23,9 @@ create table "Bookings"
 --     Со скольки стол забронирован
     "Start"       timestamp not null,
 --     До скольки стол забронирован
-    "End"         timestamp not null
+    "End"         timestamp not null,
+--     Бронь была отменена
+    "IsCanceled" boolean not null default false
 );
 
 -- Сотрудники
@@ -76,7 +69,7 @@ create table "Categories"
 create table "Items"
 (
     "Id"           bigserial primary key,
-    "categoryId"   bigint       not null references "Categories" ("Id"),
+    "CategoryId"   bigint       not null references "Categories" ("Id"),
 --     Название товара
     "Name"         varchar(64)  not null,
 --     Описание товара
@@ -89,32 +82,34 @@ create table "Items"
 create table "measuresOfItem"
 (
     "Id"            bigserial primary key,
-    "itemId"        bigint  not null references "Items" ("Id"),
+    "ItemId"        bigint  not null references "Items" ("Id"),
 --     В чем измеряется
     "MeasurementId" bigint  not null references "Measurements" ("Id"),
 --     Количество товара в данном измерении
-    "Amount"        decimal not null
+    "Amount"        decimal not null,
+    unique ("ItemId", "MeasurementId")
 );
 
 -- Цены на товар
 create table "PricesOfItem"
 (
     "Id"           bigserial primary key,
-    "itemId"       bigint    not null references "Items" ("Id"),
+    "ItemId"       bigint    not null references "Items" ("Id"),
 --     Цена товара
     "Price"        decimal   not null,
 --     Дата изменения цены на товар
-    "DateOfChange" timestamp not null
+    "DateOfChange" timestamp not null default current_timestamp
 );
 
 -- Элемент заказа
 create table "ElementsOfOrder"
 (
-    "Id"      bigserial primary key,
-    "OrderId" bigint  not null references "Orders" ("Id"),
-    "itemId"  bigint  not null references "Items" ("Id"),
+    "Id"            bigserial primary key,
+    "OrderId"       bigint  not null references "Orders" ("Id"),
+    "ItemId"        bigint  not null references "Items" ("Id"),
+    "priceOfItemId" bigint  not null references "PricesOfItem" ("Id"),
 --     Общая сумма
-    "Sum"     decimal not null default 0,
+    "Sum"           decimal not null default 0,
 --     Количество
-    "Amount"  int     not null default 0
+    "Amount"        int     not null default 0
 );

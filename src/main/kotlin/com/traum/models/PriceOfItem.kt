@@ -1,5 +1,6 @@
 package com.traum.models
 
+import com.traum.currentTimestamp
 import java.math.BigDecimal
 import java.sql.Timestamp
 
@@ -11,11 +12,10 @@ import java.sql.Timestamp
  * @property itemId идентификатор товара
  * @property item Товар
  */
-data class PriceOfItem(
-    val id: Long,
-    var price: BigDecimal,
-    var dateOfChange: Timestamp,
-    var itemId: Long
-) {
+class PriceOfItem {
+    var id: Long = 0
+    var price: BigDecimal = BigDecimal(0)
+    var dateOfChange: Timestamp = currentTimestamp()
+    var itemId: Long = 0
     var item: Item? = null
 }
