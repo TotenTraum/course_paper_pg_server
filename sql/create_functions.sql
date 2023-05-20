@@ -79,7 +79,6 @@ $$;
 --
 --////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 -- Добавить элемент заказа
 create or replace function add_elem_order(orderId bigint, itemId bigint, amount int)
     returns bigint

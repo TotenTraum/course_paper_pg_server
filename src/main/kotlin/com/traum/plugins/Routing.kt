@@ -1,14 +1,16 @@
 package com.traum.plugins
 
-import io.ktor.server.routing.*
-import io.ktor.server.response.*
-import io.ktor.server.resources.*
-import io.ktor.resources.*
-import io.ktor.server.resources.Resources
-import kotlinx.serialization.Serializable
-import io.ktor.server.plugins.statuspages.*
+import com.traum.factories.IConnectionFactory
 import io.ktor.http.*
+import io.ktor.resources.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.resources.*
+import io.ktor.server.resources.Resources
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
     install(Resources)
@@ -19,7 +21,6 @@ fun Application.configureRouting() {
     }
     routing {
         get("/") {
-            throw Exception("wewe")
             call.respondText("Hello World!")
         }
         get<Articles> { article ->

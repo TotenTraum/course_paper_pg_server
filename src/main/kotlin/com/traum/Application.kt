@@ -1,6 +1,5 @@
 package com.traum
 
-import com.traum.models.Booking
 import io.ktor.server.application.*
 import com.traum.plugins.*
 

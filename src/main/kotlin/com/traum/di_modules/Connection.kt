@@ -1,19 +1,20 @@
-package com.traum.DIModules
+package com.traum.di_modules
 
+import com.traum.factories.ConnectionFactoryImpl
+import com.traum.factories.IConnectionFactory
 import com.traum.scoped
-import com.traum.plugins.connectToPostgres
 import io.ktor.server.application.*
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import java.sql.Connection
 
 /**
  * Модуль подключения к базе данных
  */
 val ConnectionModule = scoped<Application, Module>{
     module {
-        single<Connection> {
-            this@scoped.connectToPostgres()
+        single<IConnectionFactory> {
+            val url = environment.config.property("postgres.url").getString()
+            ConnectionFactoryImpl(url)
         }
     }
 }

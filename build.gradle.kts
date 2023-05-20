@@ -1,5 +1,4 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import java.net.URL
 
 val ktor_version: String by project
 val koin_core_version: String by project
@@ -63,17 +62,18 @@ tasks.withType<DokkaTask>().configureEach {
             sourceRoots.from(file("main/kotlin/com/traum"))
 
 
-            // adds source links that lead to this repository, allowing readers
-            // to easily find source code for inspected declarations
-            sourceLink {
-                localDirectory.set(file("src/main/kotlin/com/traum"))
-                remoteUrl.set(
-                    URL("https://github.com/Kotlin/dokka/tree/master/" +
-                        "examples/gradle/dokka-gradle-example/src/main/kotlin"
-                )
-                )
-                remoteLineSuffix.set("#L")
-            }
+//            // adds source links that lead to this repository, allowing readers
+//            // to easily find source code for inspected declarations
+//            sourceLink {
+//                localDirectory.set(file("src/main/kotlin/com/traum"))
+//                remoteUrl.set(
+//                    URL(
+//                        "https://github.com/Kotlin/dokka/tree/master/" +
+//                                "examples/gradle/dokka-gradle-example/src/main/kotlin"
+//                    )
+//                )
+//                remoteLineSuffix.set("#L")
+//            }
         }
     }
 }
