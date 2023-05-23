@@ -8,9 +8,10 @@ import com.traum.models.MeasureOfItem
 interface IMeasureOfItemRepository {
     /**
      * Метод получения всех мер измерений на товаре
+     * @param itemId идентификатор товара
      * @return Список всех мер измерений на товаре
      */
-    suspend fun getAll(): List<MeasureOfItem>
+    suspend fun getAll(itemId: Long): List<MeasureOfItem>
 
     /**
      * Метод получения меры измерений на товаре по идентификатору

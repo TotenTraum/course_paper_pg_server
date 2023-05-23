@@ -18,6 +18,7 @@ class ElementOfOrder {
     var sum: BigDecimal = BigDecimal(0)
     var orderId: Long = 0
     var itemId: Long = 0
+    var priceOfItemId: Long = 0
     var order: Order? = null
     var item: Item? = null
 }

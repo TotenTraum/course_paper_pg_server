@@ -10,7 +10,14 @@ interface IPriceOfItemRepository {
      * Метод получения цен по идентификатору товара
      * @return Список всех цен
      */
-    suspend fun getAllById(itemId: Long): List<PriceOfItem>
+    suspend fun getAllByItemId(itemId: Long): List<PriceOfItem>
+
+    /**
+     * Метод получения цены по идентификатору цены
+     * @param id идентификатор цены
+     * @return Цена
+     */
+    suspend fun getById(id: Long): PriceOfItem
 
     /**
      * Метод получения последней цены по идентификатору товара

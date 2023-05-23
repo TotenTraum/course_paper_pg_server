@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.ResultSet
+import java.sql.Types
 
 @Suppress("Unused")
 class MeasureOfItemRepositoryImpl(private val connection: Connection) : IMeasureOfItemRepository {
@@ -13,15 +14,16 @@ class MeasureOfItemRepositoryImpl(private val connection: Connection) : IMeasure
         private const val SELECT_MEASURE_OF_ITEM_BY_ID =
             """select "Id", "MeasurementId", "ItemId", "Amount" from "MeasuresOfItem" where "Id" = ?"""
         private const val SELECT_MEASURE_OF_ITEM =
-            """ select "Id", "MeasurementId", "ItemId", "Amount" from "MeasuresOfItem" """
+            """ select "Id", "MeasurementId", "ItemId", "Amount" from "MeasuresOfItem" where "ItemId" = ? """
         private const val INSERT_MEASURE_OF_ITEM = "{? = call add_measure_of_item(?, ?, ?)}"
-        private const val UPDATE_MEASURE_OF_ITEM = "{call update_measure_of_item(?, ?, ?, ?)}"
-        private const val DELETE_MEASURE_OF_ITEM = "{call delete_measure_of_item(?)}"
+        private const val UPDATE_MEASURE_OF_ITEM = "call update_measure_of_item(?, ?, ?, ?)"
+        private const val DELETE_MEASURE_OF_ITEM = "call delete_measure_of_item(?)"
     }
 
-    override suspend fun getAll(): List<MeasureOfItem> = withContext(Dispatchers.IO) {
+    override suspend fun getAll(itemId: Long): List<MeasureOfItem> = withContext(Dispatchers.IO) {
         val statement =
             connection.prepareStatement(SELECT_MEASURE_OF_ITEM)
+        statement.setLong(1, itemId)
         val resultSet = statement.executeQuery()
         val result = mutableListOf<MeasureOfItem>()
         while (resultSet.next())
@@ -41,13 +43,13 @@ class MeasureOfItemRepositoryImpl(private val connection: Connection) : IMeasure
     }
 
     override suspend fun delete(id: Long): Unit = withContext(Dispatchers.IO) {
-        val statement = connection.prepareCall(DELETE_MEASURE_OF_ITEM)
+        val statement = connection.prepareStatement(DELETE_MEASURE_OF_ITEM)
         statement.setLong(1, id)
         statement.execute()
     }
 
     override suspend fun update(measureOfItem: MeasureOfItem): Unit = withContext(Dispatchers.IO) {
-        val statement = connection.prepareCall(UPDATE_MEASURE_OF_ITEM)
+        val statement = connection.prepareStatement(UPDATE_MEASURE_OF_ITEM)
         statement.setLong(1, measureOfItem.id)
         statement.setLong(2, measureOfItem.itemId)
         statement.setLong(3, measureOfItem.measurementId)
@@ -57,6 +59,7 @@ class MeasureOfItemRepositoryImpl(private val connection: Connection) : IMeasure
 
     override suspend fun add(measureOfItem: MeasureOfItem): Long = withContext(Dispatchers.IO) {
         val statement = connection.prepareCall(INSERT_MEASURE_OF_ITEM)
+        statement.registerOutParameter(1, Types.BIGINT)
         statement.setLong(2, measureOfItem.itemId)
         statement.setLong(3, measureOfItem.measurementId)
         statement.setBigDecimal(4, measureOfItem.amount)
@@ -66,10 +69,10 @@ class MeasureOfItemRepositoryImpl(private val connection: Connection) : IMeasure
 
     private fun ResultSet.toMeasureOfItem(): MeasureOfItem {
         val measureOfItem = MeasureOfItem()
-        measureOfItem.id = this.getLong("\"Id\"")
-        measureOfItem.itemId = this.getLong("\"ItemId\"")
-        measureOfItem.measurementId = this.getLong("\"MeasurementId\"")
-        measureOfItem.amount = this.getBigDecimal("\"Amount\"")
+        measureOfItem.id = this.getLong("Id")
+        measureOfItem.itemId = this.getLong("ItemId")
+        measureOfItem.measurementId = this.getLong("MeasurementId")
+        measureOfItem.amount = this.getBigDecimal("Amount")
         return measureOfItem
     }
 }

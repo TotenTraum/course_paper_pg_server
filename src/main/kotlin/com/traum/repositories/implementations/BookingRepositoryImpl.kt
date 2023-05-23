@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import org.postgresql.util.PGobject
 import java.sql.Connection
 import java.sql.ResultSet
+import java.sql.Types
 
 @Suppress("Unused")
 class BookingRepositoryImpl(private val connection: Connection) : IBookingRepository {
@@ -18,7 +19,7 @@ class BookingRepositoryImpl(private val connection: Connection) : IBookingReposi
         private const val SELECT_BOOKING =
             """select "Id", "TableId", "ContactData", "Start", "End", "IsCanceled" from "Bookings" """
         private const val INSERT_BOOKING = "{? = call add_booking(?, ?, ?)}"
-        private const val DELETE_BOOKING = "{call delete_booking(?)}"
+        private const val DELETE_BOOKING = "call delete_booking(?)"
     }
 
     override suspend fun getAll(): List<Booking> = withContext(Dispatchers.IO) {
@@ -43,13 +44,14 @@ class BookingRepositoryImpl(private val connection: Connection) : IBookingReposi
     }
 
     override suspend fun delete(id: Long): Unit = withContext(Dispatchers.IO) {
-        val statement = connection.prepareCall(DELETE_BOOKING)
+        val statement = connection.prepareStatement(DELETE_BOOKING)
         statement.setLong(1, id)
         statement.execute()
     }
 
     override suspend fun add(booking: Booking): Long = withContext(Dispatchers.IO) {
         val statement = connection.prepareCall(INSERT_BOOKING)
+        statement.registerOutParameter(1, Types.BIGINT)
         val obj = PGobject()
         obj.type = "jsonb"
         obj.value = Json.encodeToString(booking.contactData)
@@ -62,12 +64,12 @@ class BookingRepositoryImpl(private val connection: Connection) : IBookingReposi
 
     private fun ResultSet.toBooking(): Booking {
         val booking = Booking()
-        booking.id = this.getLong("\"Id\"")
-        booking.contactData = this.getString("\"ContactData\"")
-        booking.tableId = this.getLong("\"TableId\"")
-        booking.start = this.getTimestamp("\"Start\"")
-        booking.end = this.getTimestamp("\"End\"")
-        booking.isCanceled = this.getBoolean("\"IsCanceled\"")
+        booking.id = this.getLong("Id")
+        booking.contactData = this.getString("ContactData")
+        booking.tableId = this.getLong("TableId")
+        booking.start = this.getTimestamp("Start")
+        booking.end = this.getTimestamp("End")
+        booking.isCanceled = this.getBoolean("IsCanceled")
         return booking
     }
 }

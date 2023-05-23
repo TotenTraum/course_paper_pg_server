@@ -11,7 +11,7 @@ import java.sql.ResultSet
 class LogRepositoryImpl(private val connection: Connection) : ILogRepository {
     companion object {
         private const val SELECT_LOGS =
-            """select "Id", "Source", "RoleCreated", "Created" from get_logs()"""
+            """select "Id", "Source", "RoleCreated", "Created" from get_logs() """
     }
 
     override suspend fun getAll(): List<Log> = withContext(Dispatchers.IO) {
@@ -26,10 +26,10 @@ class LogRepositoryImpl(private val connection: Connection) : ILogRepository {
 
     private fun ResultSet.toLog(): Log {
         val log = Log()
-        log.id = this.getLong("\"Id\"")
-        log.roleCreated = this.getString("\"RoleCreated\"")
-        log.source = this.getString("\"Source\"")
-        log.created = this.getTimestamp("\"Created\"")
+        log.id = this.getLong("Id")
+        log.roleCreated = this.getString("RoleCreated")
+        log.source = this.getString("Source")
+        log.created = this.getTimestamp("Created")
         return log
     }
 }

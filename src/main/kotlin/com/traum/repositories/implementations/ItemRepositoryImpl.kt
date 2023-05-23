@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.ResultSet
+import java.sql.Types
 
 @Suppress("Unused")
 class ItemRepositoryImpl(private val connection: Connection) : IItemRepository {
@@ -15,8 +16,8 @@ class ItemRepositoryImpl(private val connection: Connection) : IItemRepository {
         private const val SELECT_ITEM =
             """ select "Id", "CategoryId", "Name", "Description", "IsNotForSale" from "Items" """
         private const val INSERT_ITEM = "{? = call add_item(?, ?, ?, ?)}"
-        private const val UPDATE_ITEM = "{call update_item(?, ?, ?, ?, ?)}"
-        private const val DELETE_ITEM = "{call delete_item(?)}"
+        private const val UPDATE_ITEM = "call update_item(?, ?, ?, ?, ?)"
+        private const val DELETE_ITEM = "call delete_item(?)"
     }
 
     override suspend fun getAll(): List<Item> = withContext(Dispatchers.IO) {
@@ -41,13 +42,13 @@ class ItemRepositoryImpl(private val connection: Connection) : IItemRepository {
     }
 
     override suspend fun delete(id: Long): Unit = withContext(Dispatchers.IO) {
-        val statement = connection.prepareCall(DELETE_ITEM)
+        val statement = connection.prepareStatement(DELETE_ITEM)
         statement.setLong(1, id)
         statement.execute()
     }
 
     override suspend fun update(item: Item): Unit = withContext(Dispatchers.IO) {
-        val statement = connection.prepareCall(UPDATE_ITEM)
+        val statement = connection.prepareStatement(UPDATE_ITEM)
         statement.setLong(1, item.id)
         statement.setLong(2, item.categoryId)
         statement.setString(3, item.name)
@@ -58,6 +59,7 @@ class ItemRepositoryImpl(private val connection: Connection) : IItemRepository {
 
     override suspend fun add(item: Item): Long = withContext(Dispatchers.IO) {
         val statement = connection.prepareCall(INSERT_ITEM)
+        statement.registerOutParameter(1, Types.BIGINT)
         statement.setLong(2, item.categoryId)
         statement.setString(3, item.name)
         statement.setString(4, item.description)
@@ -68,11 +70,11 @@ class ItemRepositoryImpl(private val connection: Connection) : IItemRepository {
 
     private fun ResultSet.toItem(): Item {
         val item = Item()
-        item.id = this.getLong("\"Id\"")
-        item.categoryId = this.getLong("\"CategoryId\"")
-        item.name = this.getString("\"Name\"")
-        item.description = this.getString("\"Description\"")
-        item.isNotForSale = this.getBoolean("\"IsNotForSale\"")
+        item.id = this.getLong("Id")
+        item.categoryId = this.getLong("CategoryId")
+        item.name = this.getString("Name")
+        item.description = this.getString("Description")
+        item.isNotForSale = this.getBoolean("IsNotForSale")
         return item
     }
 }

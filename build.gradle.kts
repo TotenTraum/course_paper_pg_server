@@ -1,6 +1,7 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 
 val ktor_version: String by project
+val kotlin_datetime_version: String by project
 val koin_core_version: String by project
 val koin_ktor_version: String by project
 val kotlin_version: String by project
@@ -29,6 +30,11 @@ repositories {
 }
 
 dependencies {
+//    runtimeOnly("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
+
+    implementation("io.ktor:ktor-server-openapi:$ktor_version")
+    implementation("io.ktor:ktor-network-tls-certificates:$ktor_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlin_datetime_version")
     implementation("io.insert-koin:koin-core:$koin_core_version")
     implementation("io.insert-koin:koin-ktor:$koin_ktor_version")
     implementation("io.insert-koin:koin-logger-slf4j:$koin_ktor_version")
@@ -44,7 +50,6 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
     implementation("org.postgresql:postgresql:$postgres_version")
-//    implementation("com.h2database:h2:$h2_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
@@ -58,22 +63,7 @@ tasks.withType<DokkaTask>().configureEach {
             moduleName.set("Сервер")
             // contains descriptions for the module and the packages
             includes.from("Module.md")
-
             sourceRoots.from(file("main/kotlin/com/traum"))
-
-
-//            // adds source links that lead to this repository, allowing readers
-//            // to easily find source code for inspected declarations
-//            sourceLink {
-//                localDirectory.set(file("src/main/kotlin/com/traum"))
-//                remoteUrl.set(
-//                    URL(
-//                        "https://github.com/Kotlin/dokka/tree/master/" +
-//                                "examples/gradle/dokka-gradle-example/src/main/kotlin"
-//                    )
-//                )
-//                remoteLineSuffix.set("#L")
-//            }
         }
     }
 }

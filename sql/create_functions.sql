@@ -4,7 +4,7 @@
 --
 --////////////////////////////////////////////////////////////////////////////////////////////////
 
-create or replace procedure add_log(source varchar(64), created date, role_creator name)
+create or replace procedure add_log(source varchar(64), created timestamptz, role_creator name)
     language plpgsql
 as
 $$
@@ -19,9 +19,9 @@ create or replace function get_logs()
 as
 $$
 begin
-    perform add_log('get_logs', now(), current_user);
-    return query select l."Id", l."Source", l."RoleCreated", l."Created"
-                 from "Logs" l;
+    call add_log('get_logs'::varchar(64), now(), current_user);
+    return query select "Id", "Source", "Created", "RoleCreated"
+                 from "Logs";
 end;
 $$;
 
@@ -40,7 +40,7 @@ $$
 declare
     newId bigint;
 begin
-    perform add_log('add_order', now(), current_user);
+    call add_log('add_order'::varchar(64), now(), current_user);
     insert into "Orders"("TableId", "EmployeeId", "Sum", "Date") values ($1, $2, $3, $4) returning "Id" into newId;
     return newId;
 end;
@@ -52,7 +52,7 @@ create or replace procedure delete_order(orderId bigint)
 as
 $$
 begin
-    perform add_log('delete_order', now(), current_user);
+    call add_log('delete_order'::varchar(64), now(), current_user);
     delete from "Orders" where "Orders"."Id" = $1;
 end;
 $$;
@@ -63,7 +63,7 @@ create or replace procedure update_order(id bigint, tableId bigint, employeeId b
 as
 $$
 begin
-    perform add_log('update_order', now(), current_user);
+    call add_log('update_order'::varchar(64), now(), current_user);
     update "Orders"
     set "TableId"    = tableId,
         "EmployeeId" = employeeId,
@@ -97,7 +97,7 @@ begin
     where "ItemId" = itemId
     order by "DateOfChange";
 
-    sum := price + amount::decimal;
+    sum := price * amount::decimal;
 
     insert into "ElementsOfOrder"("OrderId", "ItemId", "priceOfItemId", "Sum", "Amount")
     values (orderId, itemId, priceId, sum, amount)
@@ -107,7 +107,7 @@ begin
     set "Sum" = "Sum" + sum
     where "Id" = orderId;
 
-    perform add_log('add_elem_order', now(), current_user);
+    call add_log('add_elem_order'::varchar(64), now(), current_user);
 
     return newId;
 end;
@@ -129,7 +129,7 @@ begin
     set "Sum" = "Sum" - oldSum
     where "Id" = orderId;
 
-    perform add_log('delete_elem_order', now(), current_user);
+    call add_log('delete_elem_order'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -153,7 +153,7 @@ begin
 
     select "Sum" into oldSum from "ElementsOfOrder" where "Id" = id;
 
-    sum := price + amount::decimal;
+    sum := price * amount::decimal;
     diff := sum - oldSum;
 
     update "ElementsOfOrder"
@@ -168,7 +168,7 @@ begin
     set "Sum" = "Sum" + diff
     where "Id" = orderId;
 
-    perform add_log('update_elem_order', now(), current_user);
+    call add_log('update_elem_order'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -191,7 +191,7 @@ begin
     values ($1, $2)
     returning "Id"
         into newId;
-    perform add_log('add_price_of_item', now(), current_user);
+    call add_log('add_price_of_item'::varchar(64), now(), current_user);
     return newId;
 end;
 $$;
@@ -212,7 +212,7 @@ declare
     newId bigint;
 begin
     insert into "Employees"("Name", "PhoneNumber") values ($1, $2) returning "Id" into newId;
-    perform add_log('add_employee', now(), current_user);
+    call add_log('add_employee'::varchar(64), now(), current_user);
     return newId;
 end;
 $$;
@@ -224,7 +224,7 @@ as
 $$
 begin
     delete from "Employees" where "Employees"."Id" = $1;
-    perform add_log('delete_order', now(), current_user);
+    call add_log('delete_order'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -238,7 +238,7 @@ begin
     set "Name"        = name,
         "PhoneNumber" = phoneNumber
     where "Id" = id;
-    perform add_log('update_employee', now(), current_user);
+    call add_log('update_employee'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -258,7 +258,7 @@ declare
     newId bigint;
 begin
     insert into "Tables"("TableNumber") values ($1) returning "Id" into newId;
-    perform add_log('add_table', now(), current_user);
+    call add_log('add_table'::varchar(64), now(), current_user);
     return newId;
 end;
 $$;
@@ -270,7 +270,7 @@ as
 $$
 begin
     delete from "Tables" where "Tables"."Id" = $1;
-    perform add_log('delete_table', now(), current_user);
+    call add_log('delete_table'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -283,7 +283,7 @@ begin
     update "Tables"
     set "TableNumber" = tableNumber
     where "Id" = id;
-    perform add_log('update_table', now(), current_user);
+    call add_log('update_table'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -303,7 +303,7 @@ declare
     newId bigint;
 begin
     insert into "Measurements"("Name") values ($1) returning "Id" into newId;
-    perform add_log('add_measurement', now(), current_user);
+    call add_log('add_measurement'::varchar(64), now(), current_user);
     return newId;
 end;
 $$;
@@ -315,7 +315,7 @@ as
 $$
 begin
     delete from "Measurements" where "Measurements"."Id" = $1;
-    perform add_log('delete_measurement', now(), current_user);
+    call add_log('delete_measurement'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -328,7 +328,7 @@ begin
     update "Measurements"
     set "Name" = name
     where "Id" = id;
-    perform add_log('update_measurement', now(), current_user);
+    call add_log('update_measurement'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -348,7 +348,7 @@ declare
     newId bigint;
 begin
     insert into "Categories"("Name") values ($1) returning "Id" into newId;
-    perform add_log('add_category', now(), current_user);
+    call add_log('add_category'::varchar(64), now(), current_user);
     return newId;
 end;
 $$;
@@ -360,7 +360,7 @@ as
 $$
 begin
     delete from "Categories" where "Categories"."Id" = $1;
-    perform add_log('delete_category', now(), current_user);
+    call add_log('delete_category'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -373,7 +373,7 @@ begin
     update "Categories"
     set "Name" = name
     where "Id" = id;
-    perform add_log('update_category', now(), current_user);
+    call add_log('update_category'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -395,7 +395,7 @@ begin
     insert into "Items"("CategoryId", "Name", "Description", "IsNotForSale")
     values ($1, $2, $3, $4)
     returning "Id" into newId;
-    perform add_log('add_item', now(), current_user);
+    call add_log('add_item'::varchar(64), now(), current_user);
     return newId;
 end;
 $$;
@@ -407,7 +407,7 @@ as
 $$
 begin
     delete from "Items" where "Items"."Id" = $1;
-    perform add_log('delete_item', now(), current_user);
+    call add_log('delete_item'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -424,7 +424,7 @@ begin
         "Description"  = description,
         "IsNotForSale" = isNotForSale
     where "Id" = id;
-    perform add_log('update_item', now(), current_user);
+    call add_log('update_item'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -443,10 +443,10 @@ $$
 declare
     newId bigint;
 begin
-    insert into "measuresOfItem"("ItemId", "MeasurementId", "Amount")
+    insert into "MeasuresOfItem"("ItemId", "MeasurementId", "Amount")
     values ($1, $2, $3)
     returning "Id" into newId;
-    perform add_log('add_measure_of_item', now(), current_user);
+    call add_log('add_measure_of_item'::varchar(64), now(), current_user);
     return newId;
 end;
 $$;
@@ -457,8 +457,8 @@ create or replace procedure delete_measure_of_item(orderId bigint)
 as
 $$
 begin
-    delete from "measuresOfItem" where "measuresOfItem"."Id" = $1;
-    perform add_log('delete_measure_of_item', now(), current_user);
+    delete from "MeasuresOfItem" where "MeasuresOfItem"."Id" = $1;
+    call add_log('delete_measure_of_item'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -468,12 +468,12 @@ create or replace procedure update_measure_of_item(id bigint, itemId bigint, mea
 as
 $$
 begin
-    update "measuresOfItem"
+    update "MeasuresOfItem"
     set "MeasurementId" = measurementId,
         "ItemId"        = itemId,
         "Amount"        = amount
     where "Id" = id;
-    perform add_log('update_measure_of_item', now(), current_user);
+    call add_log('update_measure_of_item'::varchar(64), now(), current_user);
 end;
 $$;
 
@@ -495,7 +495,7 @@ begin
     insert into "Bookings"("TableId", "ContactData", "Start", "End")
     values (tableId, contactData, start, start + interval '30 minutes')
     returning "Id" into newId;
-    perform add_log('add_booking', now(), current_user);
+    call add_log('add_booking'::varchar(64), now(), current_user);
     return newId;
 end;
 $$;
@@ -509,6 +509,6 @@ begin
     update "Bookings"
         set "IsCanceled" = true
     where "Id" = id;
-    perform add_log('delete_booking', now(), current_user);
+    call add_log('delete_booking'::varchar(64), now(), current_user);
 end;
 $$;

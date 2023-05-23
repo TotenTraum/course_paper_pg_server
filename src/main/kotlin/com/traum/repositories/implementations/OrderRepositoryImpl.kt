@@ -7,16 +7,17 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import java.sql.Connection
 import java.sql.ResultSet
+import java.sql.Types
 
 @Suppress("unused")
 class OrderRepositoryImpl(private val connection: Connection) : IOrderRepository, KoinComponent {
     companion object {
         private const val SELECT_ORDER_BY_ID =
             """select "Id", "EmployeeId", "TableId", "Sum", "Date" from "Orders" where "Id" = ?"""
-        private const val SELECT_ORDER = """select "Id", "EmployeeId", "TableId", "Sum", "Date" from "Orders"""
+        private const val SELECT_ORDER = """select "Id", "EmployeeId", "TableId", "Sum", "Date" from "Orders" """
         private const val INSERT_ORDER = "{? = call add_order(?, ?, ?, ?)}"
-        private const val UPDATE_ORDER = "{call update_order(?, ?, ?, ?, ?)}"
-        private const val DELETE_ORDER = "{call delete_order(?)}"
+        private const val UPDATE_ORDER = "call update_order(?, ?, ?, ?, ?)"
+        private const val DELETE_ORDER = "call delete_order(?)"
     }
 
     override suspend fun getAll(): List<Order> = withContext(Dispatchers.IO) {
@@ -41,13 +42,13 @@ class OrderRepositoryImpl(private val connection: Connection) : IOrderRepository
     }
 
     override suspend fun delete(id: Long): Unit = withContext(Dispatchers.IO) {
-        val statement = connection.prepareCall(DELETE_ORDER)
+        val statement = connection.prepareStatement(DELETE_ORDER)
         statement.setLong(1, id)
         statement.execute()
     }
 
     override suspend fun update(order: Order): Unit = withContext(Dispatchers.IO) {
-        val statement = connection.prepareCall(UPDATE_ORDER)
+        val statement = connection.prepareStatement(UPDATE_ORDER)
         statement.setLong(1, order.id)
         statement.setLong(2, order.tableId)
         statement.setLong(3, order.employeeId)
@@ -58,6 +59,7 @@ class OrderRepositoryImpl(private val connection: Connection) : IOrderRepository
 
     override suspend fun add(order: Order): Long = withContext(Dispatchers.IO) {
         val statement = connection.prepareCall(INSERT_ORDER)
+        statement.registerOutParameter(1, Types.BIGINT)
         statement.setLong(2, order.tableId)
         statement.setLong(3, order.employeeId)
         statement.setBigDecimal(4, order.sum)
@@ -68,11 +70,15 @@ class OrderRepositoryImpl(private val connection: Connection) : IOrderRepository
 
     private fun ResultSet.toOrder(): Order {
         val order = Order()
-        order.id = this.getLong("\"Id\"")
-        order.employeeId = this.getLong("\"EmployeeId\"")
-        order.tableId = this.getLong("\"TableId\"")
-        order.sum = this.getBigDecimal("\"Sum\"")
-        order.date = this.getTimestamp("\"Date\"")
+        val meta = metaData
+        println("Columns of order")
+        for (i in 1..meta.columnCount)
+            println(meta.getColumnName(i))
+        order.id = this.getLong("Id")
+        order.employeeId = this.getLong("EmployeeId")
+        order.tableId = this.getLong("TableId")
+        order.sum = this.getBigDecimal("Sum")
+        order.date = this.getTimestamp("Date")
         return order
     }
 }

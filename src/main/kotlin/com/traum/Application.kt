@@ -1,7 +1,7 @@
 package com.traum
 
-import io.ktor.server.application.*
 import com.traum.plugins.*
+import io.ktor.server.application.*
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
@@ -12,7 +12,7 @@ fun Application.module() {
     configureSecurity()
     configureHTTP()
     configureSerialization()
-    configureDatabases()
     configureAdministration()
     configureRouting()
+    configureStatusPages()
 }

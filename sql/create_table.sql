@@ -11,7 +11,7 @@ create table "Tables"
 (
     "Id"          bigserial primary key,
 --     Номер стола
-    "TableNumber" int not null
+    "TableNumber" int not null unique
 );
 -- Таблица бронирований столов
 create table "Bookings"
@@ -25,7 +25,7 @@ create table "Bookings"
 --     До скольки стол забронирован
     "End"         timestamp not null,
 --     Бронь была отменена
-    "IsCanceled" boolean not null default false
+    "IsCanceled"  boolean   not null default false
 );
 
 -- Сотрудники
@@ -79,7 +79,7 @@ create table "Items"
 );
 
 -- Таблица мер товара в разных измерениях
-create table "measuresOfItem"
+create table "MeasuresOfItem"
 (
     "Id"            bigserial primary key,
     "ItemId"        bigint  not null references "Items" ("Id"),
