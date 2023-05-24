@@ -20,5 +20,6 @@ val RepositoriesModule = scoped<Application, Module> {
         factory<IMeasureOfItemRepository> { MeasureOfItemRepositoryImpl(get()) }
         factory<IPriceOfItemRepository> { PriceOfItemRepositoryImpl(get()) }
         factory<ITableRepository> { TableRepositoryImpl(get()) }
+        factory<IAuthRepository> { AuthRepositoryImpl(get()) }
     }
 }

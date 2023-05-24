@@ -3,6 +3,25 @@
 -- Логи
 --
 --////////////////////////////////////////////////////////////////////////////////////////////////
+create or replace function current_group()
+    returns setof name
+    language plpgsql
+as
+$$
+begin
+    return query select rolname
+                 from pg_user
+                          join pg_auth_members on (pg_user.usesysid = pg_auth_members.member)
+                          join pg_roles on (pg_roles.oid = pg_auth_members.roleid)
+                 where pg_user.usename = current_user;
+end;
+$$;
+
+--////////////////////////////////////////////////////////////////////////////////////////////////
+--
+-- Логи
+--
+--////////////////////////////////////////////////////////////////////////////////////////////////
 
 create or replace procedure add_log(source varchar(64), created timestamptz, role_creator name)
     language plpgsql
@@ -507,7 +526,7 @@ as
 $$
 begin
     update "Bookings"
-        set "IsCanceled" = true
+    set "IsCanceled" = true
     where "Id" = id;
     call add_log('delete_booking'::varchar(64), now(), current_user);
 end;

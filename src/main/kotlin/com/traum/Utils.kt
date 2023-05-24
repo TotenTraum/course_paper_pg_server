@@ -1,5 +1,6 @@
 package com.traum
 
+import com.traum.dtos.auth.LoginDTO
 import com.traum.factories.IConnectionFactory
 import com.traum.serializers.BigDecimalSerializer
 import com.traum.serializers.TimestampSerializer
@@ -26,15 +27,12 @@ import kotlin.reflect.full.withNullability
  */
 fun <T, E> scoped(func: T.() -> E): (T) -> E = { it.func() }
 
-/**
- * Получение из JWTPrincipal логин и пароль к БД
- */
-//fun IConnectionFactory.getAuthConnection(call: ApplicationCall): Connection {
-//    val principal = call.principal<JWTPrincipal>()
-//    val username = principal!!.payload.getClaim("username").asString()
-//    val password = principal.payload.getClaim("password").asString()
-//    return createConnection(username, password)
-//}
+object JWTOptions {
+    var secret: String? = null
+    var issuer: String? = null
+    var audience: String? = null
+    var myRealm: String? = null
+}
 
 object RepositoryInjector : KoinComponent {
     val factory by inject<IConnectionFactory>()
@@ -47,6 +45,17 @@ object RepositoryInjector : KoinComponent {
             password = principal.payload.getClaim("password").asString()
         }
         return this@RepositoryInjector.get<T> { parametersOf(factory.createConnection(username, password)) }
+    }
+
+    inline fun <reified T : Any> getRepository(loginDTO: LoginDTO): T {
+        return this@RepositoryInjector.get<T> {
+            parametersOf(
+                factory.createConnection(
+                    loginDTO.username,
+                    loginDTO.password
+                )
+            )
+        }
     }
 }
 
