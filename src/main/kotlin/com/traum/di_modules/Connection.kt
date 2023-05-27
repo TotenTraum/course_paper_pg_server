@@ -13,8 +13,9 @@ import org.koin.dsl.module
 val ConnectionModule = scoped<Application, Module>{
     module {
         single<IConnectionFactory> {
-            val url = environment.config.property("postgres.url").getString()
-            ConnectionFactoryImpl(url)
+            val url = environment.config.property("postgres.base_url").getString()
+            val database = environment.config.property("postgres.database").getString()
+            ConnectionFactoryImpl(url + database)
         }
     }
 }

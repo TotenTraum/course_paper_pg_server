@@ -15,8 +15,8 @@ class OrderRepositoryImpl(private val connection: Connection) : IOrderRepository
         private const val SELECT_ORDER_BY_ID =
             """select "Id", "EmployeeId", "TableId", "Sum", "Date" from "Orders" where "Id" = ?"""
         private const val SELECT_ORDER = """select "Id", "EmployeeId", "TableId", "Sum", "Date" from "Orders" """
-        private const val INSERT_ORDER = "{? = call add_order(?, ?, ?, ?)}"
-        private const val UPDATE_ORDER = "call update_order(?, ?, ?, ?, ?)"
+        private const val INSERT_ORDER = "{? = call add_order(?, ?)}"
+        private const val UPDATE_ORDER = "call update_order(?, ?, ?)"
         private const val DELETE_ORDER = "call delete_order(?)"
     }
 
@@ -52,8 +52,6 @@ class OrderRepositoryImpl(private val connection: Connection) : IOrderRepository
         statement.setLong(1, order.id)
         statement.setLong(2, order.tableId)
         statement.setLong(3, order.employeeId)
-        statement.setBigDecimal(4, order.sum)
-        statement.setTimestamp(5, order.date)
         statement.execute()
     }
 
@@ -62,8 +60,6 @@ class OrderRepositoryImpl(private val connection: Connection) : IOrderRepository
         statement.registerOutParameter(1, Types.BIGINT)
         statement.setLong(2, order.tableId)
         statement.setLong(3, order.employeeId)
-        statement.setBigDecimal(4, order.sum)
-        statement.setTimestamp(5, order.date)
         statement.execute()
         return@withContext statement.getLong(1)
     }

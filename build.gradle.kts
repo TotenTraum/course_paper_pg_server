@@ -16,6 +16,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.21"
 }
 
+java {
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 group = "com.traum"
 version = "0.0.1"
 application {

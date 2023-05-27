@@ -7,7 +7,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PatchOrderDTO(
     val tableId: Long?,
-    val employeeId: Long?,
-    val sum: BigDecimalJson?,
-    val date: TimestampJson?
+    val employeeId: Long?
 )
